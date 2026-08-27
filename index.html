@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Live Lisle High School period tracker — current period, time remaining, and school events."
+    />
+    <title>Lisle High · Period Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true"></div>
+
+    <div class="app-window">
+      <p id="error-banner" class="error" hidden></p>
+
+      <header class="topbar">
+        <div class="brand">
+          <p class="brand-name">Lisle High</p>
+          <p id="brand-sub" class="brand-sub">Live period tracker</p>
+        </div>
+        <div class="topbar-meta">
+          <p id="live-clock" class="live-clock"></p>
+          <p id="schedule-chip" class="schedule-chip"></p>
+        </div>
+      </header>
+
+      <section class="events-panel" aria-label="School events">
+        <div class="events-heading-row">
+          <div class="events-heading-group">
+            <h2 class="events-heading">School events</h2>
+            <p id="events-status" class="events-status">Loading calendar…</p>
+          </div>
+          <a
+            class="events-link"
+            href="https://www.lisle202.org/lisle-high-school/about-our-school/lhs-calendar"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Full calendar</a
+          >
+        </div>
+        <div id="events-track" class="events-track"></div>
+        <p id="events-empty" class="events-empty" hidden>
+          No upcoming events in the next 60 days.
+        </p>
+      </section>
+
+      <div class="tracker-row">
+        <main class="tracker" aria-live="polite">
+          <p id="status-title" class="status-title">Loading…</p>
+          <p id="status-sub" class="status-sub"></p>
+
+          <div class="countdown-block">
+            <p id="countdown" class="countdown">—</p>
+            <p id="countdown-label" class="countdown-label"></p>
+          </div>
+
+          <div
+            class="progress"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+            aria-label="Period progress"
+          >
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+
+          <p id="next-line" class="next-line"></p>
+
+          <p
+            id="onepride-reminder"
+            class="onepride-reminder"
+            role="status"
+            hidden
+          ></p>
+        </main>
+
+        <aside id="day-schedule" class="day-schedule" aria-label="Today's bell schedule">
+          <div class="day-schedule-top">
+            <div>
+              <h2 class="day-schedule-heading">Today’s schedule</h2>
+              <p id="day-schedule-label" class="day-schedule-label"></p>
+            </div>
+            <button
+              type="button"
+              id="schedule-enlarge-btn"
+              class="schedule-enlarge-btn"
+              aria-pressed="false"
+              aria-controls="day-schedule"
+            >
+              Enlarge
+            </button>
+          </div>
+          <ol id="day-timeline" class="day-timeline"></ol>
+        </aside>
+      </div>
+
+      <footer class="meta">
+        <div class="controls">
+          <label class="control">
+            <span>Schedule</span>
+            <select id="schedule-override" name="schedule">
+              <option value="auto">Auto (by date)</option>
+            </select>
+          </label>
+          <label class="control">
+            <span>Lunch</span>
+            <select id="lunch-pref" name="lunch">
+              <option value="A">A Lunch</option>
+              <option value="C">C Lunch</option>
+            </select>
+          </label>
+        </div>
+
+        <p class="source">
+          Times from
+          <a
+            href="https://www.lisle202.org/lisle-high-school/about-our-school/bell-schedules"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Lisle CUSD 202 bell schedules</a
+          >. Central Time.
+        </p>
+      </footer>
+    </div>
+
+    <dialog id="event-dialog" class="event-dialog">
+      <form method="dialog" class="event-dialog-inner">
+        <header class="event-dialog-header">
+          <h2 id="event-dialog-title" class="event-dialog-title"></h2>
+          <button type="submit" class="event-dialog-close" value="close" aria-label="Close">
+            Close
+          </button>
+        </header>
+        <p id="event-dialog-calendar" class="event-dialog-calendar"></p>
+        <dl class="event-dialog-dl">
+          <div>
+            <dt>When</dt>
+            <dd id="event-dialog-when"></dd>
+          </div>
+          <div>
+            <dt>Time</dt>
+            <dd id="event-dialog-time"></dd>
+          </div>
+          <div id="event-dialog-location-row" hidden>
+            <dt>Location</dt>
+            <dd id="event-dialog-location"></dd>
+          </div>
+        </dl>
+        <p class="event-dialog-note">
+          Details from the Lisle High School calendar on lisle202.org.
+        </p>
+        <a
+          id="event-dialog-link"
+          class="event-dialog-link"
+          href="https://www.lisle202.org/lisle-high-school/about-our-school/lhs-calendar"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Open on school website</a
+        >
+      </form>
+    </dialog>
+
+    <script type="module" src="js/clock.js"></script>
+  </body>
+</html>
