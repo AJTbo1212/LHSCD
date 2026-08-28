@@ -1,6 +1,6 @@
-# Lisle High · Live Period Tracker
+# Lisle Senior High School · Live Period Tracker
 
-Static live tracker for Lisle High School bell periods. Shows the current period, time remaining, school events from lisle202.org, and what’s next — all in America/Chicago time.
+Static live tracker for Lisle Senior High School bell periods. Shows the current period, time remaining, school events from lisle202.org, and what’s next — all in America/Chicago time.
 
 ## Run locally (live calendar)
 
@@ -53,6 +53,8 @@ Drag the project folder onto Netlify’s **Deploy manually** page.
 - Live period countdown + ONEPRIDE signup reminder (2 days before)
 - Enlargeable today’s schedule (Chromebook-friendly)
 - Manual schedule override + A/C lunch preference
+- Custom primary/secondary theme colors (saved in browser)
+- State-driven micro-animations (passing urgency, final-minute pulse, calm weekends, ONEPRIDE glow)
 
 ## Update schedules
 

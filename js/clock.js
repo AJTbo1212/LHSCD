@@ -6,6 +6,13 @@ import {
   setSavedOverride,
   getSavedLunch,
   setSavedLunch,
+  getSavedClockDelay,
+  setSavedClockDelay,
+  getSavedThemePrimary,
+  setSavedThemePrimary,
+  getSavedThemeSecondary,
+  setSavedThemeSecondary,
+  getAdjustedNow,
   getOneprideSignupReminder,
   chicagoDateString,
   resolveScheduleId,
@@ -39,6 +46,9 @@ const els = {
   scheduleChip: document.getElementById("schedule-chip"),
   override: document.getElementById("schedule-override"),
   lunch: document.getElementById("lunch-pref"),
+  themePrimary: document.getElementById("theme-primary"),
+  themeSecondary: document.getElementById("theme-secondary"),
+  clockDelay: document.getElementById("clock-delay"),
   error: document.getElementById("error-banner"),
   eventsTrack: document.getElementById("events-track"),
   eventsEmpty: document.getElementById("events-empty"),
@@ -63,6 +73,9 @@ let eventsByKey = new Map();
 let eventsLive = false;
 let overrideId = getSavedOverride();
 let lunchPref = getSavedLunch();
+let themePrimary = getSavedThemePrimary();
+let themeSecondary = getSavedThemeSecondary();
+let clockDelaySec = getSavedClockDelay();
 let lastSecond = -1;
 let lastReminderDate = "";
 let lastEventsDate = "";
@@ -98,6 +111,25 @@ function showError(msg) {
 function syncControls() {
   els.override.value = overrideId;
   els.lunch.value = lunchPref;
+  if (els.themePrimary) els.themePrimary.value = themePrimary;
+  if (els.themeSecondary) els.themeSecondary.value = themeSecondary;
+  if (els.clockDelay) els.clockDelay.value = String(clockDelaySec);
+}
+
+function applyThemeColors(primary, secondary) {
+  const root = document.documentElement;
+  root.style.setProperty("--gold", primary);
+  root.style.setProperty(
+    "--gold-soft",
+    `color-mix(in srgb, ${primary} 65%, white)`
+  );
+  root.style.setProperty("--line", `${primary}47`);
+  root.style.setProperty("--navy", secondary);
+  root.style.setProperty(
+    "--navy-mid",
+    `color-mix(in srgb, ${secondary} 75%, white)`
+  );
+  document.body.style.background = secondary;
 }
 
 function eventKey(ev) {
@@ -286,6 +318,10 @@ function render(status, now) {
   els.scheduleChip.textContent = status.autoPicked
     ? `Auto · ${status.scheduleLabel}`
     : `Manual · ${status.scheduleLabel}`;
+  if (clockDelaySec) {
+    const sign = clockDelaySec > 0 ? "+" : "";
+    els.scheduleChip.textContent += ` · delay ${sign}${clockDelaySec}s`;
+  }
 
   const dateStr = chicagoDateString(now);
   const resolved = resolveScheduleId(data, dateStr, overrideId);
@@ -347,11 +383,18 @@ function render(status, now) {
   renderDayTimeline(status, now);
   renderEvents(now);
   document.body.dataset.state = status.state;
+  document.body.dataset.schedule = status.scheduleId || "";
+  document.body.dataset.urgency =
+    status.state === "in_period" &&
+    status.countdownSeconds != null &&
+    status.countdownSeconds <= 60
+      ? "final-minute"
+      : "";
 }
 
 function tick() {
   if (!data) return;
-  const now = new Date();
+  const now = getAdjustedNow(clockDelaySec);
   const sec = now.getSeconds();
   if (sec === lastSecond) {
     requestAnimationFrame(tick);
@@ -419,6 +462,34 @@ els.lunch.addEventListener("change", () => {
   lastSecond = -1;
 });
 
+els.themePrimary?.addEventListener("input", () => {
+  themePrimary = setSavedThemePrimary(els.themePrimary.value);
+  els.themePrimary.value = themePrimary;
+  applyThemeColors(themePrimary, themeSecondary);
+});
+
+els.themeSecondary?.addEventListener("input", () => {
+  themeSecondary = setSavedThemeSecondary(els.themeSecondary.value);
+  els.themeSecondary.value = themeSecondary;
+  applyThemeColors(themePrimary, themeSecondary);
+});
+
+function onClockDelayInput() {
+  clockDelaySec = setSavedClockDelay(els.clockDelay.value);
+  els.clockDelay.value = String(clockDelaySec);
+  lastSecond = -1;
+}
+
+els.clockDelay?.addEventListener("change", onClockDelayInput);
+els.clockDelay?.addEventListener("input", () => {
+  // Live preview while typing/spinning, persist on change
+  const n = Number(els.clockDelay.value);
+  if (!Number.isFinite(n)) return;
+  clockDelaySec = Math.max(-600, Math.min(600, Math.round(n)));
+  lastSecond = -1;
+});
+els.clockDelay?.addEventListener("blur", onClockDelayInput);
+
 els.eventsTrack?.addEventListener("click", (e) => {
   const btn = e.target.closest(".event-item");
   if (!btn) return;
@@ -441,6 +512,7 @@ async function init() {
     data = await loadScheduleData();
     populateOverrideOptions();
     syncControls();
+    applyThemeColors(themePrimary, themeSecondary);
     setScheduleEnlarged(localStorage.getItem(SCHEDULE_ENLARGED_KEY) === "1");
     els.brandSub.textContent = "Live period tracker";
     showError("");

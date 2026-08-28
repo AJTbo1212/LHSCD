@@ -8,7 +8,20 @@ const TIMEZONE = "America/Chicago";
 const STORAGE_KEYS = {
   override: "lhs-schedule-override",
   lunch: "lhs-lunch-pref",
+  clockDelay: "lhs-clock-delay-sec",
+  themePrimary: "lhs-theme-primary",
+  themeSecondary: "lhs-theme-secondary",
 };
+
+export const DEFAULT_THEME_PRIMARY = "#d4a017";
+export const DEFAULT_THEME_SECONDARY = "#0a1628";
+
+const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
+
+function normalizeHexColor(value, fallback) {
+  const v = String(value || "").trim();
+  return HEX_COLOR_RE.test(v) ? v.toLowerCase() : fallback;
+}
 
 /**
  * Load schedule JSON. Today: local file. Later: lisle202 or a small backend.
@@ -38,6 +51,55 @@ export function getSavedLunch() {
 
 export function setSavedLunch(pref) {
   localStorage.setItem(STORAGE_KEYS.lunch, pref === "C" ? "C" : "A");
+}
+
+export function getSavedThemePrimary() {
+  return normalizeHexColor(
+    localStorage.getItem(STORAGE_KEYS.themePrimary),
+    DEFAULT_THEME_PRIMARY
+  );
+}
+
+export function setSavedThemePrimary(hex) {
+  const v = normalizeHexColor(hex, DEFAULT_THEME_PRIMARY);
+  localStorage.setItem(STORAGE_KEYS.themePrimary, v);
+  return v;
+}
+
+export function getSavedThemeSecondary() {
+  return normalizeHexColor(
+    localStorage.getItem(STORAGE_KEYS.themeSecondary),
+    DEFAULT_THEME_SECONDARY
+  );
+}
+
+export function setSavedThemeSecondary(hex) {
+  const v = normalizeHexColor(hex, DEFAULT_THEME_SECONDARY);
+  localStorage.setItem(STORAGE_KEYS.themeSecondary, v);
+  return v;
+}
+
+/**
+ * Personalized clock offset in seconds.
+ * Positive = treat "now" as later (use when school clocks run ahead of your device).
+ * Clamped to ±10 minutes.
+ */
+export function getSavedClockDelay() {
+  const n = Number(localStorage.getItem(STORAGE_KEYS.clockDelay));
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(-600, Math.min(600, Math.round(n)));
+}
+
+export function setSavedClockDelay(seconds) {
+  const n = Number(seconds);
+  const v = Number.isFinite(n) ? Math.max(-600, Math.min(600, Math.round(n))) : 0;
+  localStorage.setItem(STORAGE_KEYS.clockDelay, String(v));
+  return v;
+}
+
+/** Device time shifted by the saved (or given) delay. */
+export function getAdjustedNow(delaySeconds = getSavedClockDelay()) {
+  return new Date(Date.now() + Number(delaySeconds || 0) * 1000);
 }
 
 /**

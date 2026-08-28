@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Live Lisle High School period tracker — current period, time remaining, and school events."
+      content="Live Lisle Senior High School period tracker — current period, time remaining, and school events."
     />
-    <title>Lisle High · Period Tracker</title>
+    <title>Lisle Senior High School · Period Tracker</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -24,7 +24,7 @@
 
       <header class="topbar">
         <div class="brand">
-          <p class="brand-name">Lisle High</p>
+          <p class="brand-name">Lisle Senior High School</p>
           <p id="brand-sub" class="brand-sub">Live period tracker</p>
         </div>
         <div class="topbar-meta">
@@ -119,17 +119,55 @@
               <option value="C">C Lunch</option>
             </select>
           </label>
+          <label class="control control-color">
+            <span>Primary color</span>
+            <input
+              id="theme-primary"
+              name="theme-primary"
+              type="color"
+              value="#d4a017"
+            />
+          </label>
+          <label class="control control-color">
+            <span>Secondary color</span>
+            <input
+              id="theme-secondary"
+              name="theme-secondary"
+              type="color"
+              value="#0a1628"
+            />
+          </label>
+          <label class="control control-delay">
+            <span>Clock delay (sec)</span>
+            <input
+              id="clock-delay"
+              name="clock-delay"
+              type="number"
+              min="-600"
+              max="600"
+              step="1"
+              value="0"
+              inputmode="numeric"
+            />
+          </label>
+          <p class="delay-hint">
+            If school clocks run ahead of your device, use a positive delay (up
+            to 600s). Negative if your device is ahead.
+          </p>
         </div>
 
-        <p class="source">
-          Times from
-          <a
-            href="https://www.lisle202.org/lisle-high-school/about-our-school/bell-schedules"
-            target="_blank"
-            rel="noopener noreferrer"
-            >Lisle CUSD 202 bell schedules</a
-          >. Central Time.
-        </p>
+        <div class="meta-credits">
+          <p class="source">
+            Times from
+            <a
+              href="https://www.lisle202.org/lisle-high-school/about-our-school/bell-schedules"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Lisle CUSD 202 bell schedules</a
+            >. Central Time.
+          </p>
+          <p class="attribution">Created using Cursor AI</p>
+        </div>
       </footer>
     </div>
 
