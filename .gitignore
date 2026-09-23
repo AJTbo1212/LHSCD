@@ -1,2 +1,6 @@
 .DS_Store
 Thumbs.db
+
+# Google clasp local config
+gas/.clasp.json
+.clasp.json
