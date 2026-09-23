@@ -24,6 +24,15 @@ node scripts/build-gas.mjs
 
 That regenerates the HtmlService files in [`gas/`](gas/) from the static site sources. Hand-maintained: [`gas/Code.gs`](gas/Code.gs), [`gas/appsscript.json`](gas/appsscript.json).
 
+Local preview of the Apps Script bundle (mocks `google.script.run`):
+
+```bash
+node scripts/build-gas.mjs
+node scripts/preview-gas.mjs
+```
+
+Then open `http://localhost:8081`.
+
 ### Option A — clasp (recommended)
 
 ```bash
