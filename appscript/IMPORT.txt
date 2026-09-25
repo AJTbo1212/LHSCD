@@ -1,0 +1,53 @@
+Package folder: appscript/
+Zip: appscript/LHSCD-Appscript.zip
+
+LHSCD Appscript — make it work
+=================================
+
+This folder is a complete Google Apps Script web app.
+Send LHSCD-Appscript.zip (repo root). Recipient does not need the rest of the repo.
+
+Files (create each HTML file with the EXACT name, no .html in the Apps Script UI):
+  Code.gs      → Code.gs
+  Index.html   → HTML file named Index
+  Styles.html  → HTML file named Styles
+  Data.html    → HTML file named Data
+  Schedules.html → HTML file named Schedules
+  Events.html  → HTML file named Events
+  Clock.html   → HTML file named Clock
+  appsscript.json → Project Settings → Show "appsscript.json" (or set TZ America/Chicago)
+
+------------------------------------------------
+RECOMMENDED: clasp (avoids giant paste errors)
+------------------------------------------------
+  npm i -g @google/clasp
+  cd "LHSCD Appscript"
+  clasp login
+  clasp create --type webapp --title "LHSCD Period Tracker"
+  clasp push
+  Then in the Apps Script editor:
+    Deploy → New deployment → Web app
+      Execute as: Me
+      Who has access: Anyone
+    Authorize when prompted.
+
+------------------------------------------------
+Manual paste (script.google.com)
+------------------------------------------------
+1. https://script.google.com → New project
+2. Paste Code.gs over the default Code.gs
+3. For each HTML file above: File → New → HTML → name it exactly (Index, Styles, …)
+   Paste the matching file contents (replace the stub)
+4. Deploy → New deployment → Web app → Anyone
+5. Run testCalendar once (select testCalendar → Run) to grant UrlFetchApp
+6. Open the web app URL
+
+------------------------------------------------
+Verify it works
+------------------------------------------------
+- Editor: Run → testCalendar → should log "OK — fetched N events…"
+- Web app: status should say "Live from lisle202.org"
+- If calendar fails, events still fall back to embedded cache in Data.html
+
+Rebuild from the LHSCD repo:
+  node scripts/build-gas.mjs

@@ -1,0 +1,20 @@
+Google Apps Script package location
+===================================
+
+Look in this folder (same level as README.md):
+
+  appscript/
+
+Inside it:
+  IMPORT.txt              ← start here (how to deploy)
+  Code.gs
+  Index.html, Styles.html, Data.html, Schedules.html, Events.html, Clock.html
+  LHSCD-Appscript.zip     ← zip to send/share
+
+Also at repo root (same contents):
+  LHSCD-Appscript.zip
+  LHSCD Appscript/
+
+If you do not see these files:
+  git checkout main
+  git pull
