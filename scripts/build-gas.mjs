@@ -12,6 +12,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { execFileSync } from "node:child_process";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -281,6 +282,12 @@ function main() {
   write("Clock.html", buildClockHtml());
   write("Index.html", buildIndexHtml());
   console.log("Google Apps Script bundle ready in gas/");
+
+  // Also build the sendable "LHSCD Appscript" zip (2-file import package)
+  execFileSync(process.execPath, [path.join(__dirname, "build-lhscd-appscript.mjs")], {
+    cwd: ROOT,
+    stdio: "inherit",
+  });
 }
 
 main();
