@@ -130,6 +130,22 @@ function main() {
       `wrote ${zipName} (${fs.statSync(zipPath).size} bytes) — send this file`
     );
   }
+
+  // Also mirror into appscript/ (easy to find — no spaces in folder name)
+  const easyDir = path.join(ROOT, "appscript");
+  fs.mkdirSync(easyDir, { recursive: true });
+  for (const existing of fs.readdirSync(easyDir)) {
+    fs.unlinkSync(path.join(easyDir, existing));
+  }
+  for (const name of fs.readdirSync(OUT_DIR)) {
+    if (name === ".clasp.json") continue;
+    fs.copyFileSync(path.join(OUT_DIR, name), path.join(easyDir, name));
+  }
+  fs.copyFileSync(
+    path.join(ROOT, "LHSCD-Appscript.zip"),
+    path.join(easyDir, "LHSCD-Appscript.zip")
+  );
+  console.log(`mirrored package into appscript/`);
 }
 
 main();

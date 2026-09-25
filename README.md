@@ -12,29 +12,21 @@ Then visit `http://localhost:8080`.
 
 ## Deploy to Google Apps Script
 
-**Sendable package (repo root):** [`LHSCD-Appscript.zip`](LHSCD-Appscript.zip)
+**Find it here:** folder [`appscript/`](appscript/) (see also [`WHERE-IS-APPSCRIPT.txt`](WHERE-IS-APPSCRIPT.txt))
 
-1. Unzip → open `IMPORT.txt`
-2. Prefer **clasp push** (avoids paste size limits), or paste each HTML file into [script.google.com](https://script.google.com)
+1. Open [`appscript/IMPORT.txt`](appscript/IMPORT.txt)
+2. Prefer **clasp push**, or paste the HTML files into [script.google.com](https://script.google.com)
 3. **Deploy → New deployment → Web app → Anyone**
-4. In the editor, run **`testCalendar`** once (grants UrlFetchApp)
+4. Run **`testCalendar`** once (grants UrlFetchApp)
 5. Open the web app URL — events should say **Live from lisle202.org**
+
+Zip to send: [`appscript/LHSCD-Appscript.zip`](appscript/LHSCD-Appscript.zip)
 
 Rebuild after source changes:
 
 ```bash
 node scripts/build-gas.mjs
 ```
-
-That refreshes `gas/`, `LHSCD Appscript/`, and both zip names.
-
-Local Apps Script preview (mocks `google.script.run`):
-
-```bash
-node scripts/preview-gas.mjs
-```
-
-Then open `http://localhost:8081`.
 
 ## Deploy to Netlify
 
@@ -92,16 +84,14 @@ Edit [`js/schedule-data.json`](js/schedule-data.json):
 ## Project layout
 
 ```
+WHERE-IS-APPSCRIPT.txt  # points to the Apps Script package
+appscript/              # ← Google Apps Script package (start: IMPORT.txt)
+gas/                    # same package for clasp (dev)
 index.html
 styles.css
 netlify.toml
 netlify/functions/lhs-calendar.mjs
 js/…
-gas/                    # Google Apps Script (clasp)
-LHSCD Appscript/        # sendable copy (+ zip at repo root)
-scripts/serve.mjs
-scripts/sync-calendar.mjs
-scripts/build-gas.mjs
-scripts/build-lhscd-appscript.mjs
+scripts/…
 README.md
 ```
