@@ -1,12 +1,14 @@
 /**
- * Build the sendable "LHSCD Appscript" package.
+ * Build the sendable "LHSCD Appscript" package from gas/.
  *
- * Produces:
- *   LHSCD Appscript/     — Code.gs + Index.html + appsscript.json (2-file import)
- *   LHSCD Appscript.zip  — same files, ready to email / share
+ * Multi-file HtmlService project (paste-friendly + clasp-ready):
+ *   Code.gs, Index, Styles, Data, Schedules, Events, Clock, appsscript.json
+ *
+ * Also writes:
+ *   LHSCD Appscript.zip
+ *   LHSCD-Appscript.zip
  *
  * Does not modify the main site frontend (index.html / styles.css / js/).
- * Run after scripts/build-gas.mjs (or via that script).
  */
 
 import fs from "node:fs";
@@ -18,171 +20,114 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const GAS = path.join(ROOT, "gas");
 const OUT_DIR = path.join(ROOT, "LHSCD Appscript");
-const OUT_ZIP = path.join(ROOT, "LHSCD Appscript.zip");
+
+const COPY_FILES = [
+  "Code.gs",
+  "appsscript.json",
+  "Index.html",
+  "Styles.html",
+  "Data.html",
+  "Schedules.html",
+  "Events.html",
+  "Clock.html",
+];
 
 function readGas(name) {
   return fs.readFileSync(path.join(GAS, name), "utf8");
 }
 
-function stripGeneratedComment(text) {
-  return text.replace(/^<!-- Generated[\s\S]*?-->\n?/, "");
-}
-
-function stripOuterTag(html, tag) {
-  const open = new RegExp(`^\\s*<${tag}>\\s*`, "i");
-  const close = new RegExp(`\\s*</${tag}>\\s*$`, "i");
-  return html.replace(open, "").replace(close, "");
-}
-
-/**
- * Inline gas/ HtmlService partials into one Index.html (no include() needed).
- */
-function buildInlinedIndex() {
-  let index = stripGeneratedComment(readGas("Index.html"));
-
-  const styles = stripOuterTag(
-    stripGeneratedComment(readGas("Styles.html")),
-    "style"
-  );
-  const data = stripOuterTag(
-    stripGeneratedComment(readGas("Data.html")),
-    "script"
-  );
-  const schedules = stripOuterTag(
-    stripGeneratedComment(readGas("Schedules.html")),
-    "script"
-  );
-  const events = stripOuterTag(
-    stripGeneratedComment(readGas("Events.html")),
-    "script"
-  );
-  const clock = stripOuterTag(
-    stripGeneratedComment(readGas("Clock.html")),
-    "script"
-  );
-
-  index = index.replace(
-    /<\?!=\s*include\('Styles'\);\s*\?>/,
-    `<style>\n${styles}\n</style>`
-  );
-  index = index.replace(
-    /<\?!=\s*include\('Data'\);\s*\?>\s*<\?!=\s*include\('Schedules'\);\s*\?>\s*<\?!=\s*include\('Events'\);\s*\?>\s*<\?!=\s*include\('Clock'\);\s*\?>/,
-    `<script>\n${data}\n</script>\n<script>\n${schedules}\n</script>\n<script>\n${events}\n</script>\n<script>\n${clock}\n</script>`
-  );
-
-  if (index.includes("<?!=")) {
-    throw new Error(
-      "LHSCD Appscript Index still has template includes — rebuild gas/ first"
-    );
-  }
-
-  return `<!-- LHSCD Appscript — paste into an Apps Script HTML file named Index -->
-${index}`;
-}
-
-/**
- * Code.gs for the 2-file package (no include() helper).
- */
-function buildCodeGs() {
-  let code = readGas("Code.gs");
-
-  // Swap template+include serve path for a single Index.html file.
-  code = code.replace(
-    /function doGet\(\) \{[\s\S]*?\n\}/,
-    `function doGet() {
-  var output = HtmlService.createHtmlOutputFromFile("Index");
-  output.setTitle("Lisle Senior High School · Period Tracker");
-  output.addMetaTag("viewport", "width=device-width, initial-scale=1");
-  output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-  return output;
-}`
-  );
-
-  // Drop include() — not used in the 2-file package.
-  code = code.replace(
-    /\/\*\*\s*\n \* Include another HTML file[\s\S]*?\nfunction include\(filename\) \{[\s\S]*?\n\}\n\n/,
-    ""
-  );
-
-  code = code.replace(
-    / \* Or from gas\/: clasp push && clasp deploy\n/,
-    " * Or unzip \"LHSCD Appscript.zip\" and clasp push from that folder.\n"
-  );
-
-  return code;
-}
-
 function writeImportReadme() {
-  return `LHSCD Appscript — import & deploy
-================================
+  return `LHSCD Appscript — make it work
+=================================
 
-This folder is a complete Google Apps Script web app (2 files).
-Send "LHSCD-Appscript.zip" (repo root) — they do not need the rest of the repo.
-("LHSCD Appscript.zip" is the same package.)
+This folder is a complete Google Apps Script web app.
+Send LHSCD-Appscript.zip (repo root). Recipient does not need the rest of the repo.
 
-A) Fastest import (script.google.com)
--------------------------------------
-1. Open https://script.google.com → New project
-2. Delete the default code; paste Code.gs into Code.gs
-3. File → New → HTML file → name it exactly: Index
-4. Paste Index.html into that file (replace the default <html> stub)
-5. (Optional) Project Settings → show "appsscript.json" and paste appsscript.json
-   Or set time zone to America/Chicago
-6. Deploy → New deployment → Type: Web app
-   - Execute as: Me
-   - Who has access: Anyone
-7. Authorize when prompted (UrlFetchApp reads the school calendar)
-8. Open the web app URL
+Files (create each HTML file with the EXACT name, no .html in the Apps Script UI):
+  Code.gs      → Code.gs
+  Index.html   → HTML file named Index
+  Styles.html  → HTML file named Styles
+  Data.html    → HTML file named Data
+  Schedules.html → HTML file named Schedules
+  Events.html  → HTML file named Events
+  Clock.html   → HTML file named Clock
+  appsscript.json → Project Settings → Show "appsscript.json" (or set TZ America/Chicago)
 
-B) clasp (from this folder)
---------------------------
+------------------------------------------------
+RECOMMENDED: clasp (avoids giant paste errors)
+------------------------------------------------
   npm i -g @google/clasp
+  cd "LHSCD Appscript"
   clasp login
   clasp create --type webapp --title "LHSCD Period Tracker"
   clasp push
-  Then Deploy → Web app in the Apps Script editor (same settings as above)
+  Then in the Apps Script editor:
+    Deploy → New deployment → Web app
+      Execute as: Me
+      Who has access: Anyone
+    Authorize when prompted.
 
-Notes
------
-- Live school events need the deployed web app (UrlFetchApp). Opening Index.html
-  in a browser alone will not load the live calendar.
-- Preferences (lunch, theme, clock delay) stay in the visitor's browser localStorage.
-- Rebuild this package from the LHSCD repo with:
-    node scripts/build-gas.mjs
-    node scripts/build-lhscd-appscript.mjs
+------------------------------------------------
+Manual paste (script.google.com)
+------------------------------------------------
+1. https://script.google.com → New project
+2. Paste Code.gs over the default Code.gs
+3. For each HTML file above: File → New → HTML → name it exactly (Index, Styles, …)
+   Paste the matching file contents (replace the stub)
+4. Deploy → New deployment → Web app → Anyone
+5. Run testCalendar once (select testCalendar → Run) to grant UrlFetchApp
+6. Open the web app URL
+
+------------------------------------------------
+Verify it works
+------------------------------------------------
+- Editor: Run → testCalendar → should log "OK — fetched N events…"
+- Web app: status should say "Live from lisle202.org"
+- If calendar fails, events still fall back to embedded cache in Data.html
+
+Rebuild from the LHSCD repo:
+  node scripts/build-gas.mjs
 `;
 }
 
 function main() {
-  if (!fs.existsSync(path.join(GAS, "Index.html"))) {
-    throw new Error("gas/ missing — run node scripts/build-gas.mjs first");
+  for (const name of COPY_FILES) {
+    if (!fs.existsSync(path.join(GAS, name))) {
+      throw new Error(`gas/${name} missing — run node scripts/build-gas.mjs first`);
+    }
   }
 
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
-  const files = {
-    "Code.gs": buildCodeGs(),
-    "Index.html": buildInlinedIndex(),
-    "appsscript.json": readGas("appsscript.json"),
-    "IMPORT.txt": writeImportReadme(),
-  };
-
-  for (const [name, contents] of Object.entries(files)) {
-    const dest = path.join(OUT_DIR, name);
-    fs.writeFileSync(dest, contents);
-    console.log(`wrote ${path.relative(ROOT, dest)} (${contents.length} bytes)`);
+  // Clean old inlined-only leftovers if any
+  for (const existing of fs.readdirSync(OUT_DIR)) {
+    fs.unlinkSync(path.join(OUT_DIR, existing));
   }
 
-  // Zip at repo root for easy sharing (space name + no-space alias)
+  for (const name of COPY_FILES) {
+    const contents = readGas(name);
+    fs.writeFileSync(path.join(OUT_DIR, name), contents);
+    console.log(`wrote LHSCD Appscript/${name} (${contents.length} bytes)`);
+  }
+
+  const importTxt = writeImportReadme();
+  fs.writeFileSync(path.join(OUT_DIR, "IMPORT.txt"), importTxt);
+  console.log(`wrote LHSCD Appscript/IMPORT.txt (${importTxt.length} bytes)`);
+
+  // clasp helper (no scriptId until create)
+  fs.writeFileSync(
+    path.join(OUT_DIR, ".clasp.json.example"),
+    JSON.stringify({ scriptId: "YOUR_SCRIPT_ID", rootDir: "." }, null, 2) + "\n"
+  );
+
   for (const zipName of ["LHSCD Appscript.zip", "LHSCD-Appscript.zip"]) {
     const zipPath = path.join(ROOT, zipName);
     if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
     execFileSync("zip", ["-r", "-q", zipPath, "LHSCD Appscript"], {
       cwd: ROOT,
     });
-    const zipStat = fs.statSync(zipPath);
     console.log(
-      `wrote ${zipName} (${zipStat.size} bytes) — send this file to import`
+      `wrote ${zipName} (${fs.statSync(zipPath).size} bytes) — send this file`
     );
   }
 }
