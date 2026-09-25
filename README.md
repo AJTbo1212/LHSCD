@@ -84,16 +84,14 @@ Edit [`js/schedule-data.json`](js/schedule-data.json):
 ## Project layout
 
 ```
+WHERE-IS-APPSCRIPT.txt  # points to the Apps Script package
+appscript/              # ← Google Apps Script package (start: IMPORT.txt)
+gas/                    # same package for clasp (dev)
 index.html
 styles.css
 netlify.toml
 netlify/functions/lhs-calendar.mjs
 js/…
-gas/                    # Google Apps Script (clasp)
-LHSCD Appscript/        # sendable copy (+ zip at repo root)
-scripts/serve.mjs
-scripts/sync-calendar.mjs
-scripts/build-gas.mjs
-scripts/build-lhscd-appscript.mjs
+scripts/…
 README.md
 ```
