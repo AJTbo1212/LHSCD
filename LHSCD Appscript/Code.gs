@@ -2,8 +2,8 @@
  * Lisle Senior High School · Live Period Tracker
  * Google Apps Script web app entry point.
  *
- * Deploy: Extensions → Apps Script → Deploy → New deployment → Web app
- * Or unzip "LHSCD Appscript.zip" and clasp push from that folder.
+ * Deploy: Deploy → New deployment → Web app
+ * Or: clasp push from "LHSCD Appscript/" or gas/
  */
 
 var LHS_CALENDAR_ELEMENT =
@@ -16,17 +16,45 @@ var LHS_CALENDAR_PAGE =
  * @return {HtmlOutput}
  */
 function doGet() {
-  var output = HtmlService.createHtmlOutputFromFile("Index");
-  output.setTitle("Lisle Senior High School · Period Tracker");
-  output.addMetaTag("viewport", "width=device-width, initial-scale=1");
-  output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  var output = HtmlService.createTemplateFromFile("Index").evaluate();
+  output
+    .setTitle("Lisle Senior High School · Period Tracker")
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .addMetaTag("viewport", "width=device-width, initial-scale=1")
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   return output;
 }
 
 /**
+ * Include another HTML file's contents (CSS/JS partials).
+ * @param {string} filename file name without .html
+ * @return {string}
+ */
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
+/**
+ * Manual smoke test — run from the Apps Script editor (Run → testCalendar).
+ * Opens an authorization prompt for UrlFetchApp on first run.
+ * @return {string}
+ */
+function testCalendar() {
+  var today = Utilities.formatDate(new Date(), "America/Chicago", "yyyy-MM-dd");
+  var month = today.slice(0, 8) + "01";
+  var events = fetchLhsCalendarEvents([month]);
+  var msg =
+    "OK — fetched " +
+    events.length +
+    " events for " +
+    month +
+    (events[0] ? ". First: " + events[0].title : "");
+  Logger.log(msg);
+  return msg;
+}
+
+/**
  * Fetch + parse several calendar months in one round-trip.
- * Avoids shipping ~100KB+ of HTML through google.script.run.
- *
  * @param {string[]} monthDates list of YYYY-MM-DD (first of each month)
  * @return {Object[]} normalized event objects
  */
@@ -69,6 +97,7 @@ function fetchCalendarHtml_(dateYmd) {
   var url = LHS_CALENDAR_ELEMENT + encodeURIComponent(dateYmd);
   var response = UrlFetchApp.fetch(url, {
     muteHttpExceptions: true,
+    followRedirects: true,
     headers: {
       "User-Agent":
         "Mozilla/5.0 (compatible; LHSPeriodTracker/1.0; +apps-script)",
@@ -86,8 +115,6 @@ function fetchCalendarHtml_(dateYmd) {
 
 /**
  * Regex parse Finalsite calendar AJAX HTML (no DOM in Apps Script).
- * Mirrors scripts/sync-calendar.mjs + js/events.js parseCalendarHtml.
- *
  * @param {string} html
  * @return {Object[]}
  * @private
@@ -113,11 +140,7 @@ function parseCalendarHtml_(html) {
     var year = Number(parts[2]);
     var monthIndex = Number(parts[3]);
     var date =
-      year +
-      "-" +
-      pad2_(monthIndex + 1) +
-      "-" +
-      pad2_(day);
+      year + "-" + pad2_(monthIndex + 1) + "-" + pad2_(day);
 
     var infoChunks = box.split(/class="fsCalendarInfo"/).slice(1);
     for (var c = 0; c < infoChunks.length; c++) {

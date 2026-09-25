@@ -129,7 +129,11 @@ function buildEventsHtml() {
     }
     google.script.run
       .withSuccessHandler(resolve)
-      .withFailureHandler(reject)[fnName](...args);
+      .withFailureHandler((err) => {
+        const msg =
+          (err && (err.message || err.details || err.name)) || String(err);
+        reject(new Error(msg));
+      })[fnName](...args);
   });
 }`
   );
@@ -223,7 +227,7 @@ const {
   // Soften the Netlify-oriented error / status copy for Apps Script.
   src = src.replace(
     /"Cached events \(run node scripts\/serve\.mjs for live school calendar\)"/,
-    '"Cached events (live calendar unavailable)"'
+    '"Cached events — run testCalendar in the Apps Script editor to authorize live calendar"'
   );
   src = src.replace(
     /"Could not load schedule data\. Run: node scripts\/serve\.mjs — then open http:\/\/localhost:8080"/,
@@ -254,6 +258,10 @@ function buildIndexHtml() {
 
   // Drop external stylesheet + module script; inject Apps Script includes instead.
   let out = html
+    .replace(
+      /<head>/,
+      `<head>\n    <base target="_top" />`
+    )
     .replace(
       /\s*<link rel="stylesheet" href="styles\.css" \/>\s*/,
       "\n    <?!= include('Styles'); ?>\n"

@@ -12,65 +12,29 @@ Then visit `http://localhost:8080`.
 
 ## Deploy to Google Apps Script
 
-**Sendable import package (repo root):**
-- [`LHSCD-Appscript.zip`](LHSCD-Appscript.zip) ← use this
-- or [`LHSCD Appscript.zip`](LHSCD%20Appscript.zip) / folder [`LHSCD Appscript/`](LHSCD%20Appscript/)
+**Sendable package (repo root):** [`LHSCD-Appscript.zip`](LHSCD-Appscript.zip)
 
-Unzip → open `IMPORT.txt` → paste `Code.gs` + `Index.html` into [script.google.com](https://script.google.com) → Deploy as web app.
+1. Unzip → open `IMPORT.txt`
+2. Prefer **clasp push** (avoids paste size limits), or paste each HTML file into [script.google.com](https://script.google.com)
+3. **Deploy → New deployment → Web app → Anyone**
+4. In the editor, run **`testCalendar`** once (grants UrlFetchApp)
+5. Open the web app URL — events should say **Live from lisle202.org**
 
-The same tracker can also use the multi-file [`gas/`](gas/) project with clasp. Server-side `UrlFetchApp` replaces the Netlify calendar proxy.
-
-
-### Build the `gas/` bundle
-
-Whenever you change `index.html`, `styles.css`, or files under `js/`:
+Rebuild after source changes:
 
 ```bash
 node scripts/build-gas.mjs
 ```
 
-That regenerates the HtmlService files in [`gas/`](gas/) from the static site sources. Hand-maintained: [`gas/Code.gs`](gas/Code.gs), [`gas/appsscript.json`](gas/appsscript.json).
+That refreshes `gas/`, `LHSCD Appscript/`, and both zip names.
 
-Local preview of the Apps Script bundle (mocks `google.script.run`):
+Local Apps Script preview (mocks `google.script.run`):
 
 ```bash
-node scripts/build-gas.mjs
 node scripts/preview-gas.mjs
 ```
 
 Then open `http://localhost:8081`.
-
-### Option A — clasp (recommended)
-
-```bash
-npm i -g @google/clasp
-cd gas
-cp .clasp.json.example .clasp.json
-# Create a script in https://script.google.com, paste its Script ID into .clasp.json
-clasp login
-clasp push
-```
-
-Then in the Apps Script editor: **Deploy → New deployment → Web app**
-
-- Execute as: **Me**
-- Who has access: **Anyone** (or your Google Workspace domain)
-
-Open the web app URL. Authorize `UrlFetchApp` on first calendar load if prompted.
-
-### Option B — Manual copy/paste
-
-1. [script.google.com](https://script.google.com) → **New project**
-2. Replace `Code.gs` with [`gas/Code.gs`](gas/Code.gs)
-3. File → **New** → **HTML** for each of: `Index`, `Styles`, `Data`, `Schedules`, `Events`, `Clock` — paste the matching `gas/*.html` contents (omit the `.html` extension in the Apps Script file name)
-4. Project Settings → set time zone to **America/Chicago** (or use [`gas/appsscript.json`](gas/appsscript.json) via clasp)
-5. **Deploy → New deployment → Web app** as above
-
-### After deploy
-
-- Period countdown and controls work offline in the browser (schedule JSON is embedded).
-- **School events** should say **Live from lisle202.org** when `fetchLhsCalendarEvents` succeeds.
-- Preferences (lunch, theme, clock delay) still use `localStorage` in the visitor’s browser.
 
 ## Deploy to Netlify
 
@@ -133,9 +97,11 @@ styles.css
 netlify.toml
 netlify/functions/lhs-calendar.mjs
 js/…
-gas/                    # Google Apps Script web app (build with scripts/build-gas.mjs)
+gas/                    # Google Apps Script (clasp)
+LHSCD Appscript/        # sendable copy (+ zip at repo root)
 scripts/serve.mjs
 scripts/sync-calendar.mjs
 scripts/build-gas.mjs
+scripts/build-lhscd-appscript.mjs
 README.md
 ```
