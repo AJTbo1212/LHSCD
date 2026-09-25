@@ -383,13 +383,6 @@ function render(status, now) {
   renderDayTimeline(status, now);
   renderEvents(now);
   document.body.dataset.state = status.state;
-  document.body.dataset.schedule = status.scheduleId || "";
-  document.body.dataset.urgency =
-    status.state === "in_period" &&
-    status.countdownSeconds != null &&
-    status.countdownSeconds <= 60
-      ? "final-minute"
-      : "";
 }
 
 function tick() {

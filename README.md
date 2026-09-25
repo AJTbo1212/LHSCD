@@ -72,7 +72,7 @@ Drag the project folder onto Netlify’s **Deploy manually** page.
 - Enlargeable today’s schedule (Chromebook-friendly)
 - Manual schedule override + A/C lunch preference
 - Custom primary/secondary theme colors (saved in browser)
-- State-driven micro-animations (passing urgency, final-minute pulse, calm weekends, ONEPRIDE glow)
+- Subtle animated background drift
 
 ## Update schedules
 

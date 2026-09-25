@@ -19,6 +19,7 @@
 html,
 body {
   margin: 0;
+  min-height: 100%;
   height: 100%;
   overflow: hidden;
 }
@@ -39,7 +40,7 @@ body {
     radial-gradient(ellipse 70% 50% at 90% 80%, rgba(40, 90, 150, 0.35), transparent 50%),
     linear-gradient(165deg, color-mix(in srgb, var(--navy) 85%, black) 0%, color-mix(in srgb, var(--navy) 70%, white) 45%, var(--navy) 100%);
   pointer-events: none;
-  animation: atmosphereDrift 24s ease-in-out infinite alternate;
+  animation: atmosphereDrift 16s ease-in-out infinite alternate;
 }
 
 .atmosphere::after {
@@ -53,13 +54,17 @@ body {
 .app-window {
   position: relative;
   z-index: 1;
-  height: 100dvh;
+  min-height: 100dvh;
+  max-height: 100dvh;
   width: 100%;
   margin: 0;
   display: flex;
   flex-direction: column;
   padding: clamp(0.85rem, 2vw, 1.5rem) clamp(1rem, 3vw, 2rem);
   gap: clamp(0.75rem, 1.5vh, 1.25rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .error {
@@ -92,10 +97,11 @@ body {
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(1.5rem, 3.5vw, 2.4rem);
-  line-height: 0.95;
+  line-height: 1.1;
   letter-spacing: -0.02em;
   color: var(--gold-soft);
   animation: rise 0.7s ease-out both;
+  overflow-wrap: anywhere;
 }
 
 .brand-sub {
@@ -122,7 +128,10 @@ body {
 .schedule-chip {
   margin: 0.2rem 0 0;
   font-size: 0.85rem;
+  line-height: 1.35;
   color: var(--gold-soft);
+  max-width: min(100%, 24rem);
+  overflow-wrap: anywhere;
 }
 
 .events-panel {
@@ -353,15 +362,18 @@ body {
   grid-template-columns: minmax(0, 1.1fr) minmax(16rem, 0.9fr);
   gap: clamp(1rem, 3vw, 2.5rem);
   align-items: stretch;
+  overflow: visible;
 }
 
 .tracker {
   min-height: 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: clamp(0.5rem, 2vh, 1.5rem) 0;
   max-width: 40rem;
+  overflow: visible;
 }
 
 .day-schedule {
@@ -430,52 +442,78 @@ body.schedule-enlarged {
   overflow: hidden;
 }
 
+body.schedule-enlarged .app-window {
+  overflow: hidden;
+  pointer-events: none;
+}
+
 body.schedule-enlarged .day-schedule {
   position: fixed;
   inset: 0;
   z-index: 40;
+  width: 100%;
+  height: 100dvh;
+  max-height: none;
   margin: 0;
-  padding: clamp(1rem, 3vw, 2rem);
+  padding: clamp(0.85rem, 2.5vw, 2rem);
+  padding-left: clamp(0.85rem, 2.5vw, 2rem);
   border: none;
+  border-left: none;
+  border-top: none;
   background:
-    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(212, 160, 23, 0.12), transparent 55%),
-    #0a1628;
+    radial-gradient(ellipse 80% 50% at 20% 0%, color-mix(in srgb, var(--gold) 12%, transparent), transparent 55%),
+    var(--navy);
   box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  pointer-events: auto;
+}
+
+body.schedule-enlarged .day-schedule-top {
+  flex: 0 0 auto;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 body.schedule-enlarged .day-schedule-heading {
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-size: clamp(1.35rem, 3.5vw, 2.4rem);
 }
 
 body.schedule-enlarged .day-schedule-label {
-  font-size: clamp(1rem, 2.2vw, 1.25rem);
-  margin-top: 0.4rem;
+  font-size: clamp(0.9rem, 2vw, 1.25rem);
+  margin-top: 0.35rem;
 }
 
 body.schedule-enlarged .schedule-enlarge-btn {
-  font-size: 1rem;
-  padding: 0.65rem 1rem;
+  font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+  padding: 0.55rem 0.9rem;
 }
 
 body.schedule-enlarged .day-timeline {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
   gap: 0.35rem;
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
   padding-bottom: 1rem;
+  -webkit-overflow-scrolling: touch;
 }
 
 body.schedule-enlarged .timeline-row {
   grid-template-columns: minmax(0, 1.4fr) auto auto;
-  gap: 0.75rem 1.25rem;
-  padding: 0.7rem 0.85rem;
-  font-size: clamp(1.15rem, 2.8vw, 1.55rem);
+  gap: 0.65rem 1rem;
+  padding: 0.6rem 0.75rem;
+  font-size: clamp(1.05rem, 2.5vw, 1.55rem);
 }
 
 body.schedule-enlarged .timeline-passing {
-  font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+  font-size: clamp(0.95rem, 2.2vw, 1.35rem);
 }
 
 body.schedule-enlarged .timeline-duration {
-  min-width: 4.5rem;
+  min-width: 4.25rem;
+  font-size: inherit;
 }
 
 .timeline-row {
@@ -539,16 +577,19 @@ body.schedule-enlarged .timeline-duration {
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(2rem, 5vw, 3.4rem);
-  line-height: 1.05;
+  line-height: 1.1;
   letter-spacing: -0.02em;
   animation: rise 0.7s ease-out 0.12s both;
+  overflow-wrap: anywhere;
 }
 
 .status-sub {
   margin: 0.45rem 0 0;
   font-size: 1.05rem;
+  line-height: 1.35;
   color: var(--muted);
   animation: rise 0.7s ease-out 0.16s both;
+  overflow-wrap: anywhere;
 }
 
 .countdown-block {
@@ -589,15 +630,16 @@ body.schedule-enlarged .timeline-duration {
   width: 0%;
   background: linear-gradient(90deg, var(--gold), var(--gold-soft));
   transition: width 0.4s linear;
-  transform-origin: left center;
 }
 
 .next-line {
   margin: 1rem 0 0;
   font-size: 1.05rem;
   font-weight: 500;
+  line-height: 1.35;
   color: var(--cream);
   animation: rise 0.7s ease-out 0.28s both;
+  overflow-wrap: anywhere;
 }
 
 .onepride-reminder {
@@ -741,125 +783,19 @@ body[data-state="after"] .countdown {
   opacity: 1;
 }
 
-/* --- Micro-animations (state-driven personality) --- */
-
-body[data-state="passing"] .countdown {
-  animation: passingPulse 1.1s ease-in-out infinite;
-}
-
-body[data-state="passing"] .progress-fill {
-  animation: passingBar 1.1s ease-in-out infinite;
-}
-
-body[data-urgency="final-minute"] .progress-fill {
-  animation: progressBreathe 1.4s ease-in-out infinite;
-}
-
-body[data-urgency="final-minute"] .countdown {
-  animation: finalMinutePulse 1.4s ease-in-out infinite;
-}
-
-body[data-state="weekend"] .atmosphere,
-body[data-state="after"] .atmosphere {
-  animation: atmosphereCalm 36s ease-in-out infinite alternate;
-}
-
-body[data-schedule="onepride"] .schedule-chip {
-  animation: oneprideGlow 3s ease-in-out infinite;
-}
-
-body[data-schedule="onepride"] .events-heading {
-  animation: oneprideGlow 3.5s ease-in-out infinite;
-}
-
 @keyframes atmosphereDrift {
   from {
-    filter: brightness(1);
-    transform: scale(1);
+    filter: brightness(0.9) saturate(0.95);
+    transform: scale(1) translate(0, 0);
   }
   to {
-    filter: brightness(1.04);
-    transform: scale(1.015);
-  }
-}
-
-@keyframes atmosphereCalm {
-  from {
-    filter: brightness(0.96) saturate(0.92);
-    transform: scale(1);
-  }
-  to {
-    filter: brightness(1) saturate(1);
-    transform: scale(1.01);
-  }
-}
-
-@keyframes progressBreathe {
-  0%,
-  100% {
-    filter: brightness(1);
-    box-shadow: 0 0 0 transparent;
-  }
-  50% {
-    filter: brightness(1.15);
-    box-shadow: 0 0 10px color-mix(in srgb, var(--gold) 45%, transparent);
-  }
-}
-
-@keyframes finalMinutePulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.015);
-    opacity: 0.94;
-  }
-}
-
-@keyframes passingPulse {
-  0%,
-  100% {
-    transform: translateX(0);
-    letter-spacing: -0.03em;
-  }
-  50% {
-    transform: translateX(2px);
-    letter-spacing: -0.02em;
-  }
-}
-
-@keyframes passingBar {
-  0%,
-  100% {
-    opacity: 0.75;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-@keyframes oneprideGlow {
-  0%,
-  100% {
-    text-shadow: 0 0 0 transparent;
-  }
-  50% {
-    text-shadow: 0 0 12px color-mix(in srgb, var(--gold) 35%, transparent);
+    filter: brightness(1.1) saturate(1.08);
+    transform: scale(1.06) translate(-1.5%, -1%);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .atmosphere,
-  body[data-state="passing"] .countdown,
-  body[data-state="passing"] .progress-fill,
-  body[data-urgency="final-minute"] .progress-fill,
-  body[data-urgency="final-minute"] .countdown,
-  body[data-state="weekend"] .atmosphere,
-  body[data-state="after"] .atmosphere,
-  body[data-schedule="onepride"] .schedule-chip,
-  body[data-schedule="onepride"] .events-heading {
+  .atmosphere {
     animation: none !important;
   }
 }
@@ -884,20 +820,292 @@ body[data-schedule="onepride"] .events-heading {
     border-left: none;
     padding-left: 0;
     border-top: 1px solid var(--line);
-    padding-top: 0.85rem;
-    max-height: 40vh;
+    padding-top: 0.65rem;
+    max-height: min(34vh, 12rem);
+  }
+}
+
+/* Chromebook / compact viewport: scale UI to fit with tabs + taskbar */
+@media (max-width: 1366px), (max-height: 820px) {
+  .app-window {
+    gap: 0.5rem;
+    padding: 0.6rem 0.9rem 0.75rem;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    gap: 0.5rem 1rem;
+    padding-bottom: 0.45rem;
+  }
+
+  .topbar-meta {
+    text-align: left;
+    flex: 1 1 11rem;
+    min-width: 0;
+  }
+
+  .brand {
+    flex: 1 1 13rem;
+    min-width: 0;
+  }
+
+  .brand-name {
+    font-size: clamp(1.1rem, 2.6vw, 1.55rem);
+  }
+
+  .brand-sub {
+    font-size: 0.68rem;
+    margin-top: 0.15rem;
+    letter-spacing: 0.06em;
+  }
+
+  .live-clock {
+    font-size: 0.82rem;
+  }
+
+  .schedule-chip {
+    font-size: 0.74rem;
+    margin-top: 0.12rem;
+  }
+
+  .events-heading-row {
+    margin-bottom: 0.35rem;
+    gap: 0.65rem;
+  }
+
+  .events-heading {
+    font-size: 0.92rem;
+  }
+
+  .events-status {
+    font-size: 0.66rem;
+  }
+
+  .events-link {
+    font-size: 0.72rem;
+  }
+
+  .events-track {
+    gap: 0.35rem;
+    max-height: min(11vh, 5.75rem);
+  }
+
+  .event-item {
+    width: min(11.5rem, calc(33.333% - 0.3rem));
+    min-width: 8.25rem;
+    padding: 0.4rem 0.5rem;
+    border-left-width: 2px;
+  }
+
+  .event-day {
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
+  }
+
+  .event-title {
+    margin-top: 0.15rem;
+    font-size: 0.78rem;
+    line-height: 1.2;
+  }
+
+  .event-time {
+    margin-top: 0.12rem;
+    font-size: 0.66rem;
+  }
+
+  .event-location {
+    margin-top: 0.08rem;
+    font-size: 0.62rem;
+  }
+
+  .tracker-row {
+    flex: 0 1 auto;
+    gap: 0.65rem;
+    grid-template-columns: minmax(0, 1.05fr) minmax(13rem, 0.95fr);
+  }
+
+  .tracker {
+    justify-content: flex-start;
+    padding: 0.15rem 0;
+    max-width: 36rem;
+  }
+
+  .status-title {
+    font-size: clamp(1.35rem, 4vw, 1.85rem);
+  }
+
+  .status-sub {
+    margin-top: 0.2rem;
+    font-size: 0.86rem;
+  }
+
+  .countdown-block {
+    margin-top: 0.45rem;
+  }
+
+  .countdown {
+    font-size: clamp(1.95rem, 10vw, 3rem);
+  }
+
+  .countdown-label {
+    margin-top: 0.2rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+  }
+
+  .progress {
+    margin-top: 0.5rem;
+    height: 2px;
+    max-width: 24rem;
+  }
+
+  .next-line {
+    margin-top: 0.45rem;
+    font-size: 0.88rem;
+  }
+
+  .onepride-reminder {
+    margin-top: 0.45rem;
+    padding-top: 0.45rem;
+    font-size: 0.86rem;
+  }
+
+  .day-schedule {
+    padding: 0.2rem 0;
+    padding-left: clamp(0.65rem, 1.5vw, 1rem);
+    max-height: min(30vh, 13rem);
+  }
+
+  .day-schedule-top {
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .day-schedule-heading {
+    font-size: 0.88rem;
+  }
+
+  .day-schedule-label {
+    font-size: 0.72rem;
+    margin-top: 0.15rem;
+  }
+
+  .schedule-enlarge-btn {
+    font-size: 0.72rem;
+    padding: 0.35rem 0.55rem;
+  }
+
+  .timeline-row {
+    font-size: 0.74rem;
+    gap: 0.35rem 0.5rem;
+    padding: 0.22rem 0.35rem;
+  }
+
+  .timeline-passing {
+    font-size: 0.7rem;
+  }
+
+  .timeline-duration {
+    min-width: 3rem;
+    font-size: 0.72rem;
+  }
+
+  .meta {
+    padding-top: 0.45rem;
+    gap: 0.4rem 0.85rem;
+  }
+
+  .controls {
+    gap: 0.4rem 0.7rem;
+  }
+
+  .control {
+    gap: 0.2rem;
+    font-size: 0.66rem;
+  }
+
+  .control select {
+    min-width: 8.25rem;
+    padding: 0.38rem 1.5rem 0.38rem 0.55rem;
+    font-size: 0.8rem;
+  }
+
+  .control-delay input {
+    min-width: 6rem;
+    max-width: 7rem;
+    padding: 0.38rem 0.55rem;
+    font-size: 0.8rem;
+  }
+
+  .control-color input[type="color"] {
+    width: 2.35rem;
+    height: 2rem;
+  }
+
+  .delay-hint {
+    font-size: 0.64rem;
+    max-width: 100%;
+    margin-top: 0.1rem;
+  }
+
+  .source {
+    font-size: 0.68rem;
+    max-width: 18rem;
+  }
+
+  .attribution {
+    font-size: 0.62rem;
+  }
+}
+
+@media (max-height: 620px) {
+  .app-window {
+    gap: 0.35rem;
+    padding: 0.45rem 0.75rem 0.55rem;
+  }
+
+  .events-track {
+    max-height: 4rem;
+    gap: 0.28rem;
+  }
+
+  .event-item {
+    width: min(10.5rem, calc(50% - 0.25rem));
+    min-width: 7.5rem;
+    padding: 0.32rem 0.42rem;
+  }
+
+  .event-title {
+    font-size: 0.72rem;
+  }
+
+  .countdown {
+    font-size: clamp(1.65rem, 9vw, 2.35rem);
+  }
+
+  .status-title {
+    font-size: clamp(1.15rem, 3.5vw, 1.45rem);
+  }
+
+  .day-schedule {
+    max-height: min(26vh, 9.5rem);
+  }
+
+  .timeline-row {
+    font-size: 0.68rem;
+    padding: 0.18rem 0.3rem;
+  }
+
+  .delay-hint {
+    display: none;
   }
 }
 
 @media (max-width: 640px) {
-  html,
-  body {
-    overflow: auto;
-  }
-
   .app-window {
     height: auto;
     min-height: 100dvh;
+    max-height: none;
     overflow: visible;
   }
 
@@ -907,6 +1115,79 @@ body[data-schedule="onepride"] .events-heading {
 
   .day-schedule {
     max-height: none;
+  }
+}
+
+/* Enlarge must win over compact Chromebook shrink rules */
+@media (max-width: 1366px), (max-height: 820px), (max-width: 900px), (max-height: 620px) {
+  body.schedule-enlarged .day-schedule {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: clamp(0.75rem, 2.5vw, 1.5rem);
+    padding-left: clamp(0.75rem, 2.5vw, 1.5rem);
+    border: none;
+    border-left: none;
+    border-top: none;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    pointer-events: auto;
+  }
+
+  body.schedule-enlarged .day-schedule-top {
+    flex: 0 0 auto;
+    margin-bottom: 0.45rem;
+  }
+
+  body.schedule-enlarged .day-schedule-heading {
+    font-size: clamp(1.25rem, 3.2vw, 2rem);
+  }
+
+  body.schedule-enlarged .day-schedule-label {
+    font-size: clamp(0.85rem, 1.8vw, 1.1rem);
+    margin-top: 0.25rem;
+  }
+
+  body.schedule-enlarged .schedule-enlarge-btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.85rem;
+  }
+
+  body.schedule-enlarged .day-timeline {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overflow: auto;
+    gap: 0.3rem;
+    margin-top: 0.4rem;
+    padding-bottom: 0.75rem;
+  }
+
+  body.schedule-enlarged .timeline-row {
+    grid-template-columns: minmax(0, 1.4fr) auto auto;
+    gap: 0.5rem 0.85rem;
+    padding: 0.55rem 0.65rem;
+    font-size: clamp(0.95rem, 2.2vw, 1.35rem);
+  }
+
+  body.schedule-enlarged .timeline-passing {
+    font-size: clamp(0.88rem, 2vw, 1.2rem);
+  }
+
+  body.schedule-enlarged .timeline-duration {
+    min-width: 3.75rem;
+    font-size: inherit;
+  }
+
+  body.schedule-enlarged .app-window {
+    overflow: hidden;
+    pointer-events: none;
   }
 }
 
