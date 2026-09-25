@@ -12,7 +12,14 @@ Then visit `http://localhost:8080`.
 
 ## Deploy to Google Apps Script
 
-The same tracker can run as a Google Apps Script web app. Server-side `UrlFetchApp` replaces the Netlify calendar proxy, so live events work without Netlify.
+**Sendable import package (repo root):**
+- [`LHSCD-Appscript.zip`](LHSCD-Appscript.zip) ← use this
+- or [`LHSCD Appscript.zip`](LHSCD%20Appscript.zip) / folder [`LHSCD Appscript/`](LHSCD%20Appscript/)
+
+Unzip → open `IMPORT.txt` → paste `Code.gs` + `Index.html` into [script.google.com](https://script.google.com) → Deploy as web app.
+
+The same tracker can also use the multi-file [`gas/`](gas/) project with clasp. Server-side `UrlFetchApp` replaces the Netlify calendar proxy.
+
 
 ### Build the `gas/` bundle
 

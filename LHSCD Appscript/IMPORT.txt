@@ -1,0 +1,37 @@
+LHSCD Appscript — import & deploy
+================================
+
+This folder is a complete Google Apps Script web app (2 files).
+Send "LHSCD-Appscript.zip" (repo root) — they do not need the rest of the repo.
+("LHSCD Appscript.zip" is the same package.)
+
+A) Fastest import (script.google.com)
+-------------------------------------
+1. Open https://script.google.com → New project
+2. Delete the default code; paste Code.gs into Code.gs
+3. File → New → HTML file → name it exactly: Index
+4. Paste Index.html into that file (replace the default <html> stub)
+5. (Optional) Project Settings → show "appsscript.json" and paste appsscript.json
+   Or set time zone to America/Chicago
+6. Deploy → New deployment → Type: Web app
+   - Execute as: Me
+   - Who has access: Anyone
+7. Authorize when prompted (UrlFetchApp reads the school calendar)
+8. Open the web app URL
+
+B) clasp (from this folder)
+--------------------------
+  npm i -g @google/clasp
+  clasp login
+  clasp create --type webapp --title "LHSCD Period Tracker"
+  clasp push
+  Then Deploy → Web app in the Apps Script editor (same settings as above)
+
+Notes
+-----
+- Live school events need the deployed web app (UrlFetchApp). Opening Index.html
+  in a browser alone will not load the live calendar.
+- Preferences (lunch, theme, clock delay) stay in the visitor's browser localStorage.
+- Rebuild this package from the LHSCD repo with:
+    node scripts/build-gas.mjs
+    node scripts/build-lhscd-appscript.mjs
