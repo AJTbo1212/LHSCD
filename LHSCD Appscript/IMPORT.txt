@@ -2,7 +2,8 @@ LHSCD Appscript — import & deploy
 ================================
 
 This folder is a complete Google Apps Script web app (2 files).
-Send "LHSCD Appscript.zip" to someone — they do not need the rest of the repo.
+Send "LHSCD-Appscript.zip" (repo root) — they do not need the rest of the repo.
+("LHSCD Appscript.zip" is the same package.)
 
 A) Fastest import (script.google.com)
 -------------------------------------
